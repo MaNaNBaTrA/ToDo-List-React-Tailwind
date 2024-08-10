@@ -11,20 +11,19 @@ import { faTrashCan, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 function App() {
   const [todo, setTodo] = useState("")
   const [todos, setTodos] = useState([])
+    useEffect(() => {
+    console.log("Loading todos from localStorage");
+    let storedTodos = localStorage.getItem("todos");
 
-  useEffect(() => {
-    let String = localStorage.getItem("todos")
-
-    if (String) {
-      let todos = JSON.parse(localStorage.getItem("todos"))
-      setTodos(todos)
+    if (storedTodos) {
+      setTodos(JSON.parse(storedTodos));
     }
-  }, [])
-
-
-  const savetodo = () => {
-    localStorage.setItem("todos", JSON.stringify(todos))
-  }
+  }, []);
+  
+  useEffect(() => {
+    console.log("Saving todos to localStorage", todos);
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
 
   const Edit = (e, id) => {
     e.preventDefault();
@@ -39,7 +38,6 @@ function App() {
       return text.id !== id
     });
     setTodos(newTodos)
-    savetodo()
 
   }
 
@@ -47,13 +45,13 @@ function App() {
     if (todo.length >= 5) {
 
       setTodos([...todos, { id: uuidv4(), todo, Done: false }])
+      console.log("Adding todo", todos);
       setTodo("")
     }
     else {
       alert("Minimum 5 Letters Required!")
     }
-    savetodo()
-    console.log(todos)
+
   }
 
   const Check = (e) => {
@@ -64,8 +62,7 @@ function App() {
     let newtodos = [...todos]
     newtodos[index].Done = !newtodos[index].Done
     setTodos(newtodos)
-    savetodo()
-
+  
   }
 
   const Delete = (e, id) => {
@@ -73,7 +70,7 @@ function App() {
       return text.id !== id
     })
     setTodos(newtodos)
-    savetodo()
+
   }
 
   const Change = (e) => {
@@ -82,7 +79,7 @@ function App() {
 
   return (
     <>
-      <Navbar />
+      <Navbar/>
       <div className='flex items-center justify-center mt-10 mb-2 py-5'>
         <div className='text-4xl font-semibold flex text-nowrap gap-3'>To Do List
           <img src={Page} alt="Error" className='w-12 h-12' />
@@ -100,8 +97,8 @@ function App() {
           {todos.map(text => {
             return (
               <div key={text.id} className="task flex bg-primary w-full rounded-2xl items-center justify-between px-4 my-3">
-                <input type="checkbox" id="" className="checkbox mr-auto m-2 rounded-2xl " checked={text.Done} name={text.id} onChange={Check} />
-                <div className={text.Done ? "line-through text m-3 text-wrap" : " text m-3 text-wrap"}>{text.todo}</div>
+                <input type="checkbox" id="" className="checkbox mr-auto m-2 rounded-2xl max-w-4 max-h-3.5" checked={text.Done} name={text.id} onChange={Check} />
+                <div className={text.Done ? "line-through text m-3 text-wrap break-all w-full" : " text m-3 text-wrap break-all w-full "}>{text.todo}</div>
                 <div className="right flex space-x-4 ml-auto">
                   <div className="edit m-1 cursor-pointer" onClick={(e) => { Edit(e, text.id) }}><FontAwesomeIcon icon={faPenToSquare} style={{ color: "#000000", }} /></div>
                   <div className="delete m-1 cursor-pointer" onClick={(e) => { Delete(e, text.id) }}><FontAwesomeIcon icon={faTrashCan} style={{ color: "#000000", }} /></div>
